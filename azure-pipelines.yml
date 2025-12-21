@@ -170,11 +170,11 @@ stages:
             backendAzureRmContainerName: 'mycontainer'
             backendAzureRmKey: 'terraform.tfstate'
 
-        - task: TerraformTask@5
-          displayName: TERRAFORM_APPLY
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            workingDirectory: '$(WORK_DIR)/${{ parameters.environments }}'
-            environmentServiceNameAzureRM: '$(SVC_CONN)'
-            commandOptions: '-auto-approve'          
+        # - task: TerraformTask@5
+        #   displayName: TERRAFORM_APPLY
+        #   inputs:
+        #     provider: 'azurerm'
+        #     command: 'apply'
+        #     workingDirectory: '$(WORK_DIR)/${{ parameters.environments }}'
+        #     environmentServiceNameAzureRM: '$(SVC_CONN)'
+        #     commandOptions: '-auto-approve'          
