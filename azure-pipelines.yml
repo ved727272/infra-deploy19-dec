@@ -142,8 +142,8 @@ stages:
         - task: ManualValidation@1
           displayName: MANUAL_VALIDATION
           inputs:
-            notifyUsers: 'brijesh.zte@gmail.com'
-            approvers: 'brijesh.zte@gmail.com'
+            # notifyUsers: 'brijesh.zte@gmail.com'
+            # approvers: 'brijesh.zte@gmail.com'
             instructions: 'check and approve'
 
   - stage: TERRAFORM_APPLY
