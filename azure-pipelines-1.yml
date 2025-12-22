@@ -20,6 +20,9 @@ stages:
             cliProjectKey: 'infra-deploy19-dec'
             cliProjectName: 'infra-deploy19-dec'
             cliSources: '.'
+            extraProperties: |
+              sonar.branch.name=
+  
                       
         - task: SonarQubeAnalyze@8
           inputs:
