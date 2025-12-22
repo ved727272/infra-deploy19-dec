@@ -19,6 +19,8 @@ stages:
             configMode: 'file'
             
         - task: SonarQubeAnalyze@8
+          inputs:
+            jdkversion: 'JAVA_HOME_17_X64'
           
         - task: SonarQubePublish@8
           inputs:
