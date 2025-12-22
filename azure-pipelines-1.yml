@@ -16,8 +16,11 @@ stages:
           inputs:
             SonarQube: 'sonarsvc'
             scannerMode: 'cli'
-            configMode: 'file'
-            
+            configMode: 'manual'
+            cliProjectKey: 'infra-deploy19-dec'
+            cliProjectName: 'infra-deploy19-dec'
+            cliSources: '.'
+                      
         - task: SonarQubeAnalyze@8
           inputs:
             jdkversion: 'JAVA_HOME_17_X64'
