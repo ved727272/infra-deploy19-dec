@@ -1,0 +1,29 @@
+trigger: 
+ branches:
+   include:
+     - main
+
+pool: 
+ name: linux-hosted-agent
+
+
+stages:
+  - stage: Scan
+    jobs:
+      - job: scanning
+        steps:
+        - task: SonarQubePrepare@8
+          inputs:
+            SonarQube: 'sonarsvc'
+            scannerMode: 'cli'
+            configMode: 'file'
+            
+        - task: SonarQubeAnalyze@8
+          
+        - task: SonarQubePublish@8
+          inputs:
+            pollingTimeoutSec: '300'
+          
+
+
+
