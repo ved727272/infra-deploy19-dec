@@ -35,16 +35,15 @@ stages:
       - job: terraformlint
         displayName: Terraform Lint
         steps:
-          - task: PowerShell@2
-            displayName: tflint
+          - task: Bash@3
             continueOnError: true
             inputs:
               targetType: 'inline'
               script: |
-                - script: tflint --init
-                - script: tflint
+                tflint --init
+                tflint
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-
+ 
   - stage: Planandreview
     dependsOn: Precommit 
     displayName: plan and review
@@ -71,7 +70,7 @@ stages:
       - job: infracost
         displayName: infra cost
         steps:
-          - task: PowerShell@2
+          - task: Bash@3
             inputs:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
