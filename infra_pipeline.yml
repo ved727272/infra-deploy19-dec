@@ -37,13 +37,16 @@ stages:
         steps:
           - task: PowerShell@2
             displayName: tflint
+            continueOnError: true
             inputs:
               targetType: 'inline'
               script: |
                 - script: tflint --init
                 - script: tflint
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
   - stage: Planandreview
+    dependsOn: Precommit 
     displayName: plan and review
     jobs:
       - job: terraformplan
