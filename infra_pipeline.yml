@@ -1,0 +1,81 @@
+trigger:
+  branches:
+    include:
+      - main
+   
+
+pool:
+  name: linux-hosted-agent
+
+stages:
+  - stage: Precommit
+    displayName: precommit
+    jobs:
+      - job: terraforminitvalidate
+        displayName: terraforminit and validate
+        steps:
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'todosvc'
+              backendAzureRmStorageAccountName: 'stgacforall'
+              backendAzureRmContainerName: 'mycontainer'
+              backendAzureRmKey: 'terraform.tfstate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+  
+      - job: terraformlint
+        displayName: Terraform Lint
+        steps:
+          - task: PowerShell@2
+            displayName: tflint
+            inputs:
+              targetType: 'inline'
+              script: |
+                - script: tflint --init
+                - script: tflint
+
+  - stage: Planandreview
+    displayName: plan and review
+    jobs:
+      - job: terraformplan
+        displayName: Terraform plan
+        steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              backendServiceArm: 'todosvc'
+              backendAzureRmStorageAccountName: 'stgacforall'
+              backendAzureRmContainerName: 'mycontainer'
+              backendAzureRmKey: 'terraform.tfstate'
+          
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              environmentServiceNameAzureRM: 'todosvc'
+      - job: infracost
+        displayName: infra cost
+        steps:
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: 'infracost breakdown --path=.'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+
+              
+
+
+          
+                     
