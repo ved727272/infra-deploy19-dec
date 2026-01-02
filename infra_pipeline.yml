@@ -3,7 +3,6 @@ trigger:
     include:
       - main
    
-
 pool:
   name: linux-hosted-agent
 
@@ -12,7 +11,7 @@ stages:
     displayName: precommit
     jobs:
       - job: terraforminitvalidate
-        displayName: terraforminit and validate
+        displayName: init and validate
         steps:
           - task: TerraformInstaller@1
             inputs:
@@ -21,21 +20,38 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              backendAzureRmUseEntraIdForAuthentication: false
               backendServiceArm: 'todosvc'
               backendAzureRmStorageAccountName: 'stgacforall'
               backendAzureRmContainerName: 'mycontainer'
               backendAzureRmKey: 'terraform.tfstate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
           - task: TerraformTask@5
             inputs:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-  
-      - job: terraformlint
-        displayName: Terraform Lint
+      - job: terraformplan
+        displayName: terraform plan
         steps:
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'todosvc'
+              backendAzureRmStorageAccountName: 'stgacforall'
+              backendAzureRmContainerName: 'mycontainer'
+              backendAzureRmKey: 'terraform.tfstate'
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              environmentServiceNameAzureRM: 'todosvc'
           - task: Bash@3
+            displayName: terraform lint
             continueOnError: true
             inputs:
               targetType: 'inline'
@@ -43,38 +59,80 @@ stages:
                 tflint --init
                 tflint
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
- 
-  - stage: Planandreview
-    dependsOn: Precommit 
-    displayName: plan and review
-    jobs:
-      - job: terraformplan
-        displayName: Terraform plan
-        steps:
-          - task: TerraformTask@5
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-              backendServiceArm: 'todosvc'
-              backendAzureRmStorageAccountName: 'stgacforall'
-              backendAzureRmContainerName: 'mycontainer'
-              backendAzureRmKey: 'terraform.tfstate'
-          
-          - task: TerraformTask@5
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-              environmentServiceNameAzureRM: 'todosvc'
-      - job: infracost
-        displayName: infra cost
-        steps:
           - task: Bash@3
             inputs:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'    
+                 
+# stages:
+#   - stage: Precommit
+#     displayName: precommit
+#     jobs:
+#       - job: terraforminitvalidate
+#         displayName: terraforminit and validate
+#         steps:
+#           - task: TerraformInstaller@1
+#             inputs:
+#               terraformVersion: 'latest'
+#           - task: TerraformTask@5
+#             inputs:
+#               provider: 'azurerm'
+#               command: 'init'
+#               backendServiceArm: 'todosvc'
+#               backendAzureRmStorageAccountName: 'stgacforall'
+#               backendAzureRmContainerName: 'mycontainer'
+#               backendAzureRmKey: 'terraform.tfstate'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#           - task: TerraformTask@5
+#             inputs:
+#               provider: 'azurerm'
+#               command: 'validate'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+  
+#       - job: terraformlint
+#         displayName: Terraform Lint
+#         steps:
+#           - task: Bash@3
+#             continueOnError: true
+#             inputs:
+#               targetType: 'inline'
+#               script: |
+#                 tflint --init
+#                 tflint
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+ 
+#   - stage: Planandreview
+#     dependsOn: Precommit 
+#     displayName: plan and review
+#     jobs:
+#       - job: terraformplan
+#         displayName: Terraform plan
+#         steps:
+#           - task: TerraformTask@5
+#             inputs:
+#               provider: 'azurerm'
+#               command: 'init'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#               backendServiceArm: 'todosvc'
+#               backendAzureRmStorageAccountName: 'stgacforall'
+#               backendAzureRmContainerName: 'mycontainer'
+#               backendAzureRmKey: 'terraform.tfstate'
+          
+#           - task: TerraformTask@5
+#             inputs:
+#               provider: 'azurerm'
+#               command: 'plan'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#               environmentServiceNameAzureRM: 'todosvc'
+#       - job: infracost
+#         displayName: infra cost
+#         steps:
+#           - task: Bash@3
+#             inputs:
+#               targetType: 'inline'
+#               script: 'infracost breakdown --path=.'
+#               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
               
 
