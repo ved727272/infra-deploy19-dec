@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - none
    
 pool:
   name: linux-hosted-agent
@@ -14,9 +14,11 @@ stages:
         displayName: init and validate
         steps:
           - task: TerraformInstaller@1
+            displayName: Terraform Install
             inputs:
               terraformVersion: 'latest'
           - task: TerraformTask@5
+            displayName: terraform init
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -27,6 +29,7 @@ stages:
               backendAzureRmContainerName: 'mycontainer'
               backendAzureRmKey: 'terraform.tfstate'
           - task: TerraformTask@5
+            displayName: Terraform validate
             inputs:
               provider: 'azurerm'
               command: 'validate'
@@ -35,6 +38,7 @@ stages:
         displayName: terraform plan
         steps:
           - task: TerraformTask@5
+            displayName: terraform init
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -45,6 +49,7 @@ stages:
               backendAzureRmContainerName: 'mycontainer'
               backendAzureRmKey: 'terraform.tfstate'
           - task: TerraformTask@5
+            displayName: terraform plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
@@ -60,6 +65,7 @@ stages:
                 tflint
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
           - task: Bash@3
+            displayName: Infracost check
             inputs:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
