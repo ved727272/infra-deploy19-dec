@@ -73,7 +73,19 @@ stages:
             inputs:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'    
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+  - stage: 
+    displayName: Build Artifacts
+    jobs:
+      - job: 
+        displayName: build artifacts
+        steps:
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/environments/dev'
+              ArtifactName: 'build'
+              publishLocation: 'Container'
+
                  
 # stages:
 #   - stage: Precommit
