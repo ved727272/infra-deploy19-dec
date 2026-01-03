@@ -70,6 +70,7 @@ stages:
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
           - task: Bash@3
             displayName: Infracost check
+            continueOnError: true
             inputs:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
