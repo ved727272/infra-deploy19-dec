@@ -52,13 +52,6 @@ stages:
               backendAzureRmStorageAccountName: 'stgacforall'
               backendAzureRmContainerName: 'mycontainer'
               backendAzureRmKey: 'terraform.tfstate'
-          - task: TerraformTask@5
-            displayName: terraform plan
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-              environmentServiceNameAzureRM: 'todosvc'
           - task: Bash@3
             displayName: terraform lint
             continueOnError: true
@@ -68,6 +61,13 @@ stages:
                 tflint --init
                 tflint
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+          - task: TerraformTask@5
+            displayName: terraform plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              environmentServiceNameAzureRM: 'todosvc'
           - task: Bash@3
             displayName: Infracost check
             continueOnError: true
@@ -75,17 +75,6 @@ stages:
               targetType: 'inline'
               script: 'infracost breakdown --path=.'
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-  - stage: 
-    displayName: Build Artifacts
-    jobs:
-      - job: 
-        displayName: build artifacts
-        steps:
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/environments/dev'
-              ArtifactName: 'build'
-              publishLocation: 'Container'
 
                  
 # stages:
